@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Registration Page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="https://d396qusza40orc.cloudfront.net/startup%2Fcode%2Fbootstrap-combined.no-icons.min.css">
+    <script src="https://d396qusza40orc.cloudfront.net/startup%2Fcode%2Fjquery.js"></script>
+    <script src="https://d396qusza40orc.cloudfront.net/startup%2Fcode%2Fbootstrap.js"></script>
+    <link rel="stylesheet" href="css/organize.css">
+  </head>
+  <body>
+    <!-- bootstrap icons at the top of the page -->
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <button type="button" class="btn btn-navbar"
+                  data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="brand" href="/index.html">Main Menu</a>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li class="active"><a href="/index.html">Register</a></li>
+              <li><a href="/map.html">Map</a></li>
+              <li><a href="/about.html">About</a></li>
+              <li><a href="/signin.html">Login</a></li>
+              <li><a href="/terms.html">Terms</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <form id="form1" enctype="multipart/form-data" method="post" action="/upload">
+
+      <div class="row">
+        <span>Full Name</span><br><br>
+        <input type="text" name="firstName" id="firstName" placeholder="First name..." />
+        <input type="text" name="lastName" id="lastName" placeholder="Last name..." />
+      </div>
+
+      <div class="row">
+        <span>e-Mail Address</span><br><br>
+        <input type="text" name="eMailAddress" id="eMailAddress" placeholder="example@gmail.com" />
+      </div>
+
+      <div class="row">
+        <span>Phone Number</span><br><br>
+        <input type="text" name="phoneNumber" id="phoneNumber" placeholder="(804) 999-9999" />
+      </div>
+
+      <div class="row">
+        <span>Address</span><br><br>
+        <input type="text" name="address" id="address" placeholder="Enter your street address..."/>
+	<br>
+	<input type="text" name="city" id="city" placeholder="Richmond/Glen Allen/etc" />
+      </div>
+
+      <div class="row">
+        <label>Church</label>
+        <select id="church">
+          <option value="Third Church">Third Church</option>
+          <option value="East End Fellowship">East End Fellowship</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+
+      <div class="row">
+	<div class="form-group">
+  	  <div ng-include src="useragreement-template.html"></div>
+          <div class="position-center">
+            <label for="agreementCheckbox">
+              <input type="checkbox" id="agreementCheckbox" ng-model="User.hasAgreedToTerms" required=""/>&nbsp;&nbsp;
+              <small>I agree to the terms of <a href="/terms.html">how this data will be used</a></small>
+            </label> 
+          </div>
+        </div>
+      </div>
+
+      <br>
+      <br>
+
+      <div class="row">
+        <input type="button" onclick="uploadFile()" value="Register" />
+      </div>
+
+    </form>
+
+    <br><br>
+  </body>
+</html>

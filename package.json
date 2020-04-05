@@ -18,7 +18,6 @@
   "author": "Terren Peterson",
   "license": "Apache-2.0",
   "dependencies": {
-    "alexa-sdk": "^2.649",
     "aws-sdk": "^2.649.0",
     "express": "^4.17",
     "formidable": "^1.2.2"

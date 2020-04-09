@@ -4,26 +4,21 @@
 
 var express = require('express')
 var fs = require('fs');
-var formidable = require('formidable');
 var AWS = require('aws-sdk');
-    AWS.config.update({region:'us-east-1'});
+    AWS.config.update({region:'us-east-2'});
 
 var app = express();
 
 // set variables for the various html file names
 
 var INPUT_FILE = "index.html";
-var USER_AGREEMENT_FILE = "useragreement-template.html";
 var MAP_FILE = "map.html";
-var TERMS_FILE = "terms.html";
 var RICHMOND_FILE = "richmond.html";
 
 // read html files into memory so that they can be responded to when a http request is made
 
 var upload_page = fs.readFileSync(INPUT_FILE, 'utf8');
-var user_agreement_page = fs.readFileSync(USER_AGREEMENT_FILE, 'utf8');
 var map_page = fs.readFileSync(MAP_FILE, 'utf8');
-var terms_page = fs.readFileSync(TERMS_FILE, 'utf8');
 var richmond_page = fs.readFileSync(RICHMOND_FILE, 'utf8');
 
 // this gets static files linked so that they may be served in get requests
@@ -34,8 +29,13 @@ app.use('/css', express.static(__dirname + '/css'));
 // this processes the main request to the home page
 
 app.get('/', function (req, res) {
-  res.send(upload_page)
+  res.send(richmond_page)
   console.log('basic website hit');
+})
+
+app.get('/ping.html', function (req, res) {
+  res.send(upload_page)
+  console.log('successful ping made');
 })
 
 app.get('/index.html', function (req, res) {

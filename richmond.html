@@ -3,7 +3,7 @@
 
 <head>
   <meta charset='utf-8' />
-  <title>Example Richmond Mapbox</title>
+  <title>Love Your Neighbor Map</title>
   <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
   <!-- Import Mapbox GL JS -->
   <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.8.1/mapbox-gl.js'></script>
@@ -19,12 +19,55 @@
       bottom: 0;
       width: 100%;
     }
+
+    /**
+    * Set rules for how the map overlays
+    * (information box and legend) will be displayed
+    * on the page. */
+    .map-overlay {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      background: rgba(255, 255, 255, 0.8);
+      margin-right: 20px;
+      font-family: Arial, sans-serif;
+      overflow: auto;
+      border-radius: 3px; 
+    }
+
+    #features {
+      padding: 10px;
+      top: 0;
+      height: 90px;
+      margin-top: 10px;
+      width: 250px;
+    }
+
+    #legend {
+      padding: 10px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+      line-height: 18px; 
+      height: 0px;
+      margin-bottom: 40px;
+      width: 0px;
+    }
+
+    .legend-key {
+      display: inline-block;  
+      border-radius: 20%;
+      width: 10px;
+      height: 10px;
+      margin-right: 5px;
+    }
   </style>
 </head>
 
 <body>
 
   <div id='map'></div>
+  <div class='map-overlay' id='features'><h2>For Richmond</h2><h3>Love Your Neighbor Map</h3></div>
+  <div class='map-overlay' id='legend'></div>
+
   <script>
     mapboxgl.accessToken = 'pk.eyJ1IjoidGVycmVuIiwiYSI6ImNrOGtpbWd0ejAwamwzZHA2b21uczN5MHMifQ.2p8i_s3eCBY0UDB3ed59uQ';
 
@@ -32,7 +75,7 @@
       container: 'map', // The container ID
       style: 'mapbox://styles/terren/ck8nfu4bx2f6u1ipj44p23po5', // Custom style with imported data points
       center: [-77.43, 37.54], // Starting position [longitude, latitude] of Richmond
-      zoom: 13 // Starting zoom level
+      zoom: 11 // Starting zoom level
     });
   </script>
 

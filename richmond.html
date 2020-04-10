@@ -37,7 +37,7 @@
 
     #features {
       padding: 10px;
-      top: 0;
+      bottom: 100px;
       height: 90px;
       margin-top: 10px;
       width: 250px;
@@ -77,6 +77,9 @@
       center: [-77.43, 37.54], // Starting position [longitude, latitude] of Richmond
       zoom: 11 // Starting zoom level
     });
+
+    // Add zoom and rotation controls to the map.
+    map.addControl(new mapboxgl.NavigationControl());
   </script>
 
 </body>

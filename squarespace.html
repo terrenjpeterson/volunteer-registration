@@ -1,0 +1,20 @@
+<!-- Import Mapbox GL JS -->
+<script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.8.1/mapbox-gl.js'></script>
+<link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.8.1/mapbox-gl.css' rel='stylesheet' />
+<div id="map" style="width:100%; height:600px;"></div>
+
+<script>
+  mapboxgl.accessToken = 'pk.eyJ1IjoidGVycmVuIiwiYSI6ImNrOGtpbWd0ejAwamwzZHA2b21uczN5MHMifQ.2p8i_s3eCBY0UDB3ed59uQ';
+
+  var map = new mapboxgl.Map({
+    container: 'map', // The container ID
+    style: 'mapbox://styles/terren/ck8nfu4bx2f6u1ipj44p23po5', // Custom style with imported data points
+    center: [-77.43, 37.54], // Starting position [longitude, latitude] of Richmond
+    zoom: 11 // Starting zoom level
+  });
+
+  // Add zoom and rotation controls to the map.
+  map.addControl(new mapboxgl.NavigationControl());
+</script>
+  
+

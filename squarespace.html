@@ -15,6 +15,42 @@
 
   // Add zoom and rotation controls to the map.
   map.addControl(new mapboxgl.NavigationControl());
+
+  //
+  map.on('load', function() {
+      // Change the cursor to a pointer when the mouse is over the Churches layer.
+      map.on('mouseenter', 'churches', function() {
+        map.getCanvas().style.cursor = 'pointer';
+      });
+
+      // Change it back to a pointer when it leaves.
+      map.on('mouseleave', 'churches', function() {
+        map.getCanvas().style.cursor = '';
+      });
+
+      // When a click event occurs on a feature in the churches layer, open a popup at the
+      // location of the feature, with the website description from the data set properties.
+      map.on('click', 'churches', function(e) {
+        var coordinates = e.features[0].geometry.coordinates.slice();
+        var website = e.features[0].properties.Website;
+        var name = e.features[0].properties.Name_of_Church;
+
+        var display = '<html>' + 'Website: <a href="' + website + '" target="_blank" >' + website + '</a></html>' ;
+
+        // Ensure that if the map is zoomed out such that multiple
+        // copies of the feature are visible, the popup appears
+        // over the copy being pointed to.
+        while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+          coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+        }
+
+        // Create the popup box
+        new mapboxgl.Popup()
+          .setLngLat(coordinates)
+          .setHTML(display)
+          .addTo(map);
+      });
+  });
 </script>
   
 

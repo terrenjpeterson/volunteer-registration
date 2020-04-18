@@ -32,17 +32,18 @@ exports.handler = (event, context, callback) => {
 
                     console.log("Matching Data for " + JSON.stringify(baseData.features[0]));
 
-                    var enrichedGeoData = {};
+                    var enrichedDataObject = {};
+                    var enrichedGeoArray = [];
 
                     for (var j = 0; j < baseData.features.length; j++) {
                         for (var i = 0; i < volunteerData.length; i++) {
-                            //console.log("matching:" + volunteerData[i].fullName);
+                            var enrichedGeoObject = {};
+
                             if (volunteerData[i].fullName == baseData.features[j].properties.volunteer) {
-                                console.log("found match");
-                                console.log("volunteer:" + JSON.stringify(volunteerData[i]));
+                                console.log("found match for volunteer:" + JSON.stringify(volunteerData[i]));
 
                                 // copy from base data for attributes that don't change
-                                enrichedGeoData.type = baseData.features[j].type;
+                                enrichedGeoObject.type = baseData.features[j].type;
 
                                 // create new enriched data properties
                                 var properties = {};
@@ -55,19 +56,38 @@ exports.handler = (event, context, callback) => {
                                     properties.level = volunteerData[i].level;
 
                                 // now add the enriched properties
-                                enrichedGeoData.properties = properties;
+                                enrichedGeoObject.properties = properties;
 
                                 // copy from base data for attributes that don't change
-                                enrichedGeoData.geometry = baseData.features[j].geometry;
-                                enrichedGeoData.id = baseData.features[j].id;
+                                enrichedGeoObject.geometry = baseData.features[j].geometry;
+                                enrichedGeoObject.id = baseData.features[j].id;
                                 
-                                console.log("Enriched Data:" + JSON.stringify(enrichedGeoData));
+                                // now push to array
+                                enrichedGeoArray.push(enrichedGeoObject);
+                                //console.log("New Enriched Data Object:" + JSON.stringify(enrichedGeoObject));
                             }
                         }
                     }
+                    console.log("all done");
+                    console.log("Array Created with " + enrichedGeoArray.length + " entries.");
+                    
+                    enrichedDataObject.features = enrichedGeoArray;
+                    //console.log("New Enriched Data:" + JSON.stringify(enrichedDataObject));
+
+                    var postData = JSON.stringify(enrichedDataObject);
+                    
+                    var putParams = {Bucket : 'for-richmond-data',
+                                    Key : 'enrichedvolunteers.geojson',
+                                    Body: postData};
+                                    
+                    s3.putObject(putParams, function(err, data) {
+                        if(err)
+                            console.log('Error posting data' + err);
+                        else
+                            console.log('Successfully posted data');
+                    });
                 }
             });
         }
     });
 };
-

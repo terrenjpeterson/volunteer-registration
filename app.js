@@ -14,12 +14,14 @@ var app = express();
 var INPUT_FILE = "index.html";
 var MAP_FILE = "map.html";
 var RICHMOND_FILE = "richmond.html";
+var ADMIN_FILE = "admin.html";
 
 // read html files into memory so that they can be responded to when a http request is made
 
 var upload_page = fs.readFileSync(INPUT_FILE, 'utf8');
 var map_page = fs.readFileSync(MAP_FILE, 'utf8');
 var richmond_page = fs.readFileSync(RICHMOND_FILE, 'utf8');
+var admin_page = fs.readFileSync(ADMIN_FILE, 'utf8');
 
 // this gets static files linked so that they may be served in get requests
 
@@ -46,6 +48,11 @@ app.get('/index.html', function (req, res) {
 app.get('/richmond.html', function (req, res) {
   res.send(richmond_page)
   console.log('richmond map page hit');
+})
+
+app.get('/admin.html', function (req, res) {
+  res.send(admin_page)
+  console.log('admin map page hit');
 })
 
 app.get('/map.html', function (req, res) {

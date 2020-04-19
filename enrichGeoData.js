@@ -3,7 +3,7 @@
 var aws = require('aws-sdk');
 
 exports.handler = (event, context, callback) => {
-    console.log('completed request');
+    console.log('Begin Processing');
 
     var s3 = new aws.S3();
             
@@ -20,7 +20,7 @@ exports.handler = (event, context, callback) => {
             // now retrieve the volunteer data
             getParams.Key = 'volunteers.json';
 
-            console.log("Retrieving Volunteer Data")
+            console.log("Retrieving Volunteer Data");
 
             s3.getObject(getParams, function(err, data) {
                 if(err)
@@ -30,17 +30,20 @@ exports.handler = (event, context, callback) => {
                     var volunteerData = eval('(' + data.Body + ')');
                     //console.log(JSON.stringify(volunteerData[0]));
 
-                    console.log("Matching Data for " + JSON.stringify(baseData.features[0]));
-
                     var enrichedDataObject = {};
                     var enrichedGeoArray = [];
 
                     for (var j = 0; j < baseData.features.length; j++) {
+                        var foundMatch = false;
+                        console.log("Matching Data for " + JSON.stringify(baseData.features[j]));
+
                         for (var i = 0; i < volunteerData.length; i++) {
                             var enrichedGeoObject = {};
 
                             if (volunteerData[i].fullName == baseData.features[j].properties.volunteer) {
-                                console.log("found match for volunteer:" + JSON.stringify(volunteerData[i]));
+                                //console.log("found match for volunteer:" + JSON.stringify(volunteerData[i]));
+                                //console.log("found match for volunteer number :" + j);
+                                foundMatch = true;
 
                                 // copy from base data for attributes that don't change
                                 enrichedGeoObject.type = baseData.features[j].type;
@@ -50,11 +53,18 @@ exports.handler = (event, context, callback) => {
                                     properties.volunteer = volunteerData[i].fullName;
                                     properties.email = volunteerData[i].email;
                                     properties.phone = volunteerData[i].phone;
-                                    properties.addressStreet = volunteerData[i].addressStreet;
-                                    properties.addressCity = volunteerData[i].addressCity;
+                                    //properties.addressStreet = volunteerData[i].addressStreet;
+                                    //properties.addressCity = volunteerData[i].addressCity;
                                     properties.church = volunteerData[i].church;
                                     properties.level = volunteerData[i].level;
-
+                                if (baseData.features[j].geometry.type == "LineString") {
+                                //    properties.mapLocation = baseData.features[j].geometry.coordinates
+                                    properties.mapLocation = baseData.features[j].geometry.coordinates[0];
+                                } else {
+                                    properties.mapLocation = baseData.features[j].geometry.coordinates[0][0];
+                                }
+                                //console.log("Map Location :" + properties.mapLocation);
+                                
                                 // now add the enriched properties
                                 enrichedGeoObject.properties = properties;
 
@@ -67,10 +77,14 @@ exports.handler = (event, context, callback) => {
                                 //console.log("New Enriched Data Object:" + JSON.stringify(enrichedGeoObject));
                             }
                         }
+                        if (!foundMatch) {
+                            console.log("Error - No match found for " + baseData.features[j].properties.volunteer);
+                        }
                     }
                     console.log("all done");
                     console.log("Array Created with " + enrichedGeoArray.length + " entries.");
                     
+                    enrichedDataObject.type = "FeatureCollection";
                     enrichedDataObject.features = enrichedGeoArray;
                     //console.log("New Enriched Data:" + JSON.stringify(enrichedDataObject));
 
@@ -91,3 +105,4 @@ exports.handler = (event, context, callback) => {
         }
     });
 };
+

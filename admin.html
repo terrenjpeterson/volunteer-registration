@@ -75,7 +75,7 @@
       container: 'map', // The container ID
       style: 'mapbox://styles/terren/ck95zzrjl27jj1jo5481pztj2', // Custom style for administrator view
       center: [-77.43, 37.54], // Starting position [longitude, latitude] of Richmond
-      zoom: 11 // Starting zoom level
+      zoom: 10 // Starting zoom level
     });
 
     // Add zoom and rotation controls to the map.
@@ -97,40 +97,35 @@
       // location of the feature, with description HTML from its properties.
       map.on('click', 'volunteers', function(e) {
         var coordinates = e.features[0].geometry.coordinates[0];
-	var coorTest = "-77.419087,37.546431";
-	var coordinateBreak = coorTest.search(/37/);
-	var latCoordinate = parseFloat(coordinates.slice(0,5));
-	//var longCoordinate = parseFloat(coordinates.slice(coordinateBreak,99));
-	var longCoordinate = 37.54;
+        var mapLocation = e.features[0].properties.mapLocation;
         var fullName = e.features[0].properties.volunteer;
-	var church = e.features[0].properties.church;
-	var email = e.features[0].properties.email;
-	var phone = e.features[0].properties.phone;
-	var level = e.features[0].properties.level;
+        var church = e.features[0].properties.church;
+        var email = e.features[0].properties.email;
+        var phone = e.features[0].properties.phone;
+        var level = e.features[0].properties.level;
 
-	//var display = 'test' + coordinates[0];
-	var display = '<html>' + '<b>' + 'Name: ' + '</b>' + fullName + '<br>' +
-	  'e-mail: ' + email + '<br>' + 'phone: ' + phone + '<br>' +
-	  'level: ' + level + '<br>' +
-	//  'Coordinate: ' + coordinateBreak +
-	  'Church: ' + church + '</html>' ;
- 
+        //var display = 'test' + coordinates[0];
+        var display = '<html>' + '<b>' + 'Name: ' + '</b>' + fullName + '<br>' +
+          'e-mail: ' + email + '<br>' + 'phone: ' + phone + '<br>' +
+          'level: ' + level + '<br>' +
+          'map: ' + mapLocation + '<br>' +
+          'Church: ' + church + '</html>' ;
+
         // Ensure that if the map is zoomed out such that multiple
         // copies of the feature are visible, the popup appears
         // over the copy being pointed to.
         while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
           coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
         }
- 
-	// Create the popup box
+
+        // Create the popup box
         new mapboxgl.Popup()
-	  .setLngLat([latCoordinate, longCoordinate])
+          .setLngLat([-77.43, 37.54])
+          //.setLngLat(mapLocation)
           .setHTML(display)
           .addTo(map);
       });
-
     });
-
   </script>
 
 </body>

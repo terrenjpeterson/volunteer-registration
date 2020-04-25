@@ -21,11 +21,15 @@ exports.handler = (event, context, callback) => {
             
             // create master array object
             var masterArray = [];
+
+            console.log("file length :" + rows.length);
+
+            var fileLength = (rows.length - 1);
             
             // start for loop at 1 to skip the header with column names
-            for (var i = 1; i < rows.length; i++) {
+            for (var i = 1; i < fileLength; i++) {
                 //console.log("row data:" + rows[i]);
-
+                
                 var components = rows[i].split("\"");
                 var datapoints = components[1].split(" ");
 
@@ -38,40 +42,40 @@ exports.handler = (event, context, callback) => {
                     geometryCoordinates.push(position);
                 }
                 //console.log("geometry :" + JSON.stringify(geometryCoordinates));
-                
-                var geometryType = {};
-                if (datapoints.length > 2) {
-                    geometryType = "Polygon";
-                } else {
-                    geometryType = "LineString";
-                }
 
                 var geometry = {};
-                if (geometryType == "Polygon") {
-                    var geometryCoordinatesArray = [];
-                        geometryCoordinatesArray.push(geometryCoordinates);
-                    geometry.coordinates = geometryCoordinatesArray;
-                } else {
                     geometry.coordinates = geometryCoordinates;
-                }
-                    geometry.type = geometryType;
+                    geometry.type = "LineString";
                 
                 // parse out the line in the csv file
                 var columns = components[0].split(",");
+                //console.log(columns);
+                var streetNumbers = components[2].split(",");
+                //console.log(streetNumbers);
+                
                 var properties = {};
-                    properties.volunteer = columns[16];
+                    properties.streetType = columns[9];
+                    properties.functionalClass = columns[11];
+                    properties.streetName = columns[27];
+                    properties.leftFromAddress = streetNumbers[1];
+                    properties.leftToAddress = streetNumbers[2];
+                    properties.rightFromAddress = streetNumbers[3];
+                    properties.rightToAddress = streetNumbers[4];
 
                 // create an object and associate column names to attributes for the object
                 var feature = {};
                     feature.type = "Feature";
                     feature.properties = properties;
                     feature.geometry = geometry;
-                    feature.id = columns[1];
+                    feature.id = columns[5];
 
                 console.log(JSON.stringify(feature));
-                // push the new feature object into the array    
-                masterArray.push(feature); 
-            
+                // push the new feature object into the array
+                if (properties.streetType !== "Alley") {
+                    masterArray.push(feature);
+                } else {
+                    console.log("skipping alley");
+                }
             }
             console.log("Full Array:" + JSON.stringify(masterArray));
 

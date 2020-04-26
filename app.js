@@ -14,14 +14,20 @@ var app = express();
 var INPUT_FILE = "index.html";
 var MAP_FILE = "map.html";
 var RICHMOND_FILE = "richmond.html";
+var THIRD_FILE = "third.html";
 var ADMIN_FILE = "admin.html";
+var STREETS_FILE = "streets.html";
+var GOOGLE_FILE = "google.html";
 
 // read html files into memory so that they can be responded to when a http request is made
 
 var upload_page = fs.readFileSync(INPUT_FILE, 'utf8');
 var map_page = fs.readFileSync(MAP_FILE, 'utf8');
 var richmond_page = fs.readFileSync(RICHMOND_FILE, 'utf8');
+var third_page = fs.readFileSync(THIRD_FILE, 'utf8');
 var admin_page = fs.readFileSync(ADMIN_FILE, 'utf8');
+var google_page = fs.readFileSync(GOOGLE_FILE, 'utf8');
+var streets_page = fs.readFileSync(STREETS_FILE, 'utf8');
 
 // this gets static files linked so that they may be served in get requests
 
@@ -50,7 +56,27 @@ app.get('/richmond.html', function (req, res) {
   console.log('richmond map page hit');
 })
 
+app.get('/streets.html', function (req, res) {
+  res.send(streets_page)
+  console.log('streets map page hit');
+})
+
+app.get('/google.html', function (req, res) {
+  res.send(google_page)
+  console.log('google page hit');
+})
+
+app.get('/third.html', function (req, res) {
+  res.send(third_page)
+  console.log('third map page hit');
+})
+
 app.get('/admin.html', function (req, res) {
+  res.send(admin_page)
+  console.log('admin map page hit');
+})
+
+app.get('/.html', function (req, res) {
   res.send(admin_page)
   console.log('admin map page hit');
 })

@@ -17,6 +17,8 @@ var RICHMOND_FILE = "richmond.html";
 var THIRD_FILE = "third.html";
 var ADMIN_FILE = "admin.html";
 var STREETS_FILE = "streets.html";
+var HENRICO_FILE = "henrico.html";
+var ASSIGN_FILE = "assign.html";
 var GOOGLE_FILE = "google.html";
 
 // read html files into memory so that they can be responded to when a http request is made
@@ -28,6 +30,8 @@ var third_page = fs.readFileSync(THIRD_FILE, 'utf8');
 var admin_page = fs.readFileSync(ADMIN_FILE, 'utf8');
 var google_page = fs.readFileSync(GOOGLE_FILE, 'utf8');
 var streets_page = fs.readFileSync(STREETS_FILE, 'utf8');
+var henrico_page = fs.readFileSync(HENRICO_FILE, 'utf8');
+var assign_page = fs.readFileSync(ASSIGN_FILE, 'utf8');
 
 // this gets static files linked so that they may be served in get requests
 
@@ -56,9 +60,19 @@ app.get('/richmond.html', function (req, res) {
   console.log('richmond map page hit');
 })
 
+app.get('/assign.html', function (req, res) {
+  res.send(assign_page)
+  console.log('volunteer assignment page hit');
+})
+
 app.get('/streets.html', function (req, res) {
   res.send(streets_page)
   console.log('streets map page hit');
+})
+
+app.get('/henrico.html', function (req, res) {
+  res.send(henrico_page)
+  console.log('henrico map page hit');
 })
 
 app.get('/google.html', function (req, res) {

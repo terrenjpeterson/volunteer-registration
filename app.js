@@ -20,6 +20,7 @@ var STREETS_FILE = "streets.html";
 var HENRICO_FILE = "henrico.html";
 var ASSIGN_FILE = "assign.html";
 var GOOGLE_FILE = "google.html";
+var BLOCK_FILE = "data/blockData.geojson";
 
 // read html files into memory so that they can be responded to when a http request is made
 
@@ -32,11 +33,20 @@ var google_page = fs.readFileSync(GOOGLE_FILE, 'utf8');
 var streets_page = fs.readFileSync(STREETS_FILE, 'utf8');
 var henrico_page = fs.readFileSync(HENRICO_FILE, 'utf8');
 var assign_page = fs.readFileSync(ASSIGN_FILE, 'utf8');
+var blockRawData = fs.readFileSync(BLOCK_FILE, 'utf8');
 
 // this gets static files linked so that they may be served in get requests
 
 app.use('/js', express.static(__dirname + '/js'));
 app.use('/css', express.static(__dirname + '/css'));
+
+// this loads block level data
+console.log("Loading Block Level Data");
+var blockData = eval('(' + blockRawData + ')');
+
+console.log("First Record");
+console.log(blockData.features[0].properties);
+console.log("Total Records: " + blockData.features.length);
 
 // this processes the main request to the home page
 
@@ -137,8 +147,46 @@ app.post('/updateBlock', function (request, response) {
 
     console.log('data provided: ' + JSON.stringify(volunteerData));
 
+    console.log('Looking for Street Name: ' + volunteerData.streetName);
+
+    var matchedBlocks = 0;
+    var matchedId = '';
+
+    for (var i = 0; i < blockData.features.length; i++) {
+      if (blockData.features[i].properties.streetName == volunteerData.streetName) {
+        console.log("Found Match :" + JSON.stringify(blockData.features[i]));
+	// check to see if a street number was provided
+	if (volunteerData.streetNumber == '') {
+	    matchedBlocks += 1;
+	    matchedId = blockData.features[i].id;
+	} else {
+	    console.log("Match Street Number: " + volunteerData.streetNumber);
+	    console.log("Block Data: " + JSON.stringify(blockData.features[i]));
+	    if (volunteerData.streetNumber == blockData.features[i].properties.leftFromAddress ||
+	        volunteerData.streetNumber == blockData.features[i].properties.leftToAddress ||
+		volunteerData.streetNumber == blockData.features[i].properties.rightFromAddress ||
+		volunteerData.streetNumber == blockData.features[i].properties.rightToAddress) {
+		  matchedBlocks += 1;
+		  matchedId = blockData.features[i].id;
+	    }
+	}
+      }
+    }
+
+    console.log("Blocks Matched :" + matchedBlocks);
+
+    // format response
+    var responseMessage = '';
+    if (matchedBlocks == 0) {
+      responseMessage = 'Block Not Found';
+    } else if (matchedBlocks == 1) {
+      responseMessage = 'Found Block. Id:' + matchedId;
+    } else {
+      responseMessage = 'Multiple blocks found. Please add Street Number';
+    }
+
     // send response back
-    response.send('complete');
+    response.send(responseMessage);
 
   });
 })

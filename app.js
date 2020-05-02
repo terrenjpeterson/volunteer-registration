@@ -115,10 +115,10 @@ app.get('/ping.html', function (req, res) {
   console.log('someone pinged me');
 })
 
-app.post('/validateGame', function (request, response) {
+app.post('/updateBlock', function (request, response) {
   var reqInfo = request.headers['user-agent'];
   var reqDevice = reqInfo.slice(13, reqInfo.search(";"))
-  console.log('attempted to validate a game id using device ' + reqDevice);
+  console.log('attempted to update a block using device ' + reqDevice);
 
   //
   // first receive the game id object coming in from the request
@@ -129,118 +129,19 @@ app.post('/validateGame', function (request, response) {
     data += chunk;
   });
   request.on("end", function() {
-    // object has been received - now validate if its in the DDB table
+    // object has been received - now process
+    console.log("Processing Request");
 
-    var gameData = eval('(' + data + ')');
-    var gameId = gameData.gameId;
-    var gameDt = gameData.gameDt;
+    var volunteerData = eval('(' + data + ')');
+    //var gameId = gameData.gameId;
 
-    console.log('game id validation provided: ' + gameId);
+    console.log('data provided: ' + JSON.stringify(volunteerData));
 
-    var docClient = new AWS.DynamoDB.DocumentClient();
+    // send response back
+    response.send('complete');
 
-    var params = {
-        TableName: "scavangeGameTbl",
-        KeyConditionExpression: "#gameDt = :gameDt and #gameId = :gameId",
-        ExpressionAttributeNames:{ "#gameDt": "gameDt", "#gameId": "gameId" },
-        ExpressionAttributeValues: { ":gameDt":gameDt, ":gameId":gameId }
-    };
-
-    docClient.query(params, function(err,result) {
-        if(err) {
-            console.log('error' + err);
-            response.send('error occurred' + err);
-        } else {
-            // if the dynamoDB query comes back empty, send not found message - else return game information
-            var responseData = {};
-                responseData.gameId = gameId;
-            if (result.Items.length === 0) {
-                responseData.gameIdValid = false;
-                responseData.message = 'could not find game ' + gameData.gameId;
-            } else {
-                responseData.gameIdValid = true;
-                responseData.items = result.Items[0].objects.values;
-            }
-            response.send(responseData);
-        }
-    });
   });
 })
-
-app.post('/upload', function(request, response) {
-  console.log('upload attempted');
-
-  var form = new formidable.IncomingForm();
-  var uploadStatus = 'normal';
-
-  // this sets the directory for the file to be uploaded in
-  // as well as keeping the file extension
-
-  form.uploadDir = 'upld';
-  form.keepExtensions = true;
-
-  form.on('aborted', function() {
-    console.log('receipt upload process aborted');
-    uploadStatus = 'aborted';
-  });
-
-  form.on('fileBegin', function() {
-    console.log('begin receiving file');
-  });
-
-  form.on('field', function() {
-    console.log('field received');
-  });
-
-  form.on('file', function() {
-    console.log('file detected');
-  });
-
-  form.parse(request, function(err, fields, files) {
-    console.log('upload status : ' + uploadStatus);
-
-    // this gets passed once the file transmission is complete
-    if (uploadStatus == 'normal') {
-      console.log('file successfully uploaded now writing to s3');
-
-      console.log('fields: ' + JSON.stringify(fields));
-      console.log('game id: ' + fields.gameId);
-      console.log('file data: ' + JSON.stringify(files.fileToUpload));
-
-      var newImage = files.fileToUpload.path;
-      console.log('attempting to read: ' + newImage);
-
-      var tempFile = fs.readFileSync(newImage, 'binary');
-
-      var uploadFile = new Buffer(tempFile, 'binary');
-
-      //var saveObj = fields.gameId + '/' + files.fileToUpload.name;
-      var saveObj = fields.gameId + '/' + files.fileToUpload.path.slice(5,99);
-
-      var s3 = new AWS.S3();
-
-      var params = {Bucket: 'scavengerhuntskill',
-                    Key: saveObj,
-                    Body: uploadFile,
-                    ContentType: 'image/jpeg'};
-
-      s3.putObject(params, function(err, data) {
-        if (err)
-          console.log('Error uploading receipt to AWS-S3: ' + err)
-        else
-          console.log('Successfully uploaded new image to AWS-S3' );
-        response.send();
-      });
-    }
-
-  });
-
-  form.on('error', function(err) {
-    console.log('Error in receipt upload with message ' + err);
-    uploadStatus = 'error';
-  });
-
-});
 
 app.listen(3000, function () {
   console.log('Registration app listening on port 3000!')

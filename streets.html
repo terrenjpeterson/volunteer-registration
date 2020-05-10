@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset='utf-8' />
+  <title>Love Your Neighbor Map</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular-resource.min.js"></script>
+  <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+  <!-- Import Mapbox GL JS -->
+  <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.8.1/mapbox-gl.js'></script>
+  <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.8.1/mapbox-gl.css' rel='stylesheet' />
+  <link rel="stylesheet" href="https://d396qusza40orc.cloudfront.net/startup%2Fcode%2Fbootstrap-combined.no-icons.min.css">
+  <script src="https://d396qusza40orc.cloudfront.net/startup%2Fcode%2Fjquery.js"></script>
+  <script src="https://d396qusza40orc.cloudfront.net/startup%2Fcode%2Fbootstrap.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+    #map {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 100%;
+    }
+
+    /**
+    * Set rules for how the map overlays
+    * (information box and legend) will be displayed
+    * on the page. */
+    .map-overlay {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      background: rgba(255, 255, 255, 0.8);
+      margin-right: 20px;
+      font-family: Arial, sans-serif;
+      overflow: auto;
+      border-radius: 3px; 
+    }
+  </style>
+</head>
+
+<body>
+    <!-- bootstrap icons at the top of the page -->
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <button type="button" class="btn btn-navbar"
+                  data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="brand" href="/index.html">Main Menu</a>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li><a href="/assign.html">Assign</a></li>
+              <li><a href="/admin.html">Admin</a></li>
+              <li class="active"><a href="/streets.html">Map</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  <div id='map'></div>
+
+  <script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoidGVycmVuIiwiYSI6ImNrOGtpbWd0ejAwamwzZHA2b21uczN5MHMifQ.2p8i_s3eCBY0UDB3ed59uQ';
+
+    var map = new mapboxgl.Map({
+      container: 'map', // The container ID
+      style: 'mapbox://styles/terren/ck9frvzi41hz51iqpzsjd734c', // Custom style for the For Richmond map
+      center: [-77.43, 37.54], // Starting position [longitude, latitude] of Third Church
+      zoom: 14 // Starting zoom level
+    });
+
+    // Add zoom and rotation controls to the map.
+    map.addControl(new mapboxgl.NavigationControl());
+
+    //
+    map.on('load', function() {
+      // Change the cursor to a pointer when the mouse is over the Churches layer.
+      map.on('mouseenter', 'richmond-streets', function() {
+        map.getCanvas().style.cursor = 'pointer';
+      });
+ 
+      // Change it back to a pointer when it leaves.
+      map.on('mouseleave', 'richmond-streets', function() {
+        map.getCanvas().style.cursor = '';
+      });
+
+      // When a click event occurs on a feature in the places layer, open a popup at the
+      // location of the feature, with description HTML from its properties.
+      map.on('click', 'richmond-streets', function(e) {
+        var coordinates = e.features[0].geometry.coordinates[0];
+	var streetName = e.features[0].properties.streetName;
+	var streetType = e.features[0].properties.streetType;
+	var functionalClass = e.features[0].properties.functionalClass;
+	var volunteerStatus = e.features[0].properties.volunteerStatus;
+	var blockId = e.features[0].id;
+	var leftFromAddress = e.features[0].properties.leftFromAddress;
+        var leftToAddress = e.features[0].properties.leftToAddress;
+        var rightFromAddress = e.features[0].properties.rightFromAddress;
+        var rightToAddress = e.features[0].properties.rightToAddress;
+
+        //var display = 'test' + coordinates[0];
+        var display = '<html>' + '<b>' + 'Block : ' + '</b>' + 
+	    leftToAddress + '-' + leftFromAddress + ' ' + streetName + '<br>' + '<br>';
+	//    'Block ID: ' + String(blockId) + '<br>';
+	//    'Street Type: ' + streetType + '<br>Functional Class: ' + functionalClass + '<br>' + '<br>';
+
+	if (volunteerStatus) {
+	    display = display + 'Block has been adopted!' + '<br>' + '</html>';
+	} else {
+	    display = display + '<a href="https://www.forrichmond.org/loveyourneighbor">' +
+		'<button>Volunteer Block</button>' + '<br>' +
+		'</a>' + '</html>';
+	}
+
+        // Ensure that if the map is zoomed out such that multiple
+        // copies of the feature are visible, the popup appears
+        // over the copy being pointed to.
+        while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+          coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+        }
+
+        // Create the popup box
+        new mapboxgl.Popup()
+          .setLngLat(coordinates)
+          .setHTML(display)
+          .addTo(map);
+      });
+    });
+  </script>
+
+</body>
+
+</html>

@@ -50,6 +50,7 @@
             <ul class="nav">
               <li class="active"><a href="/assign.html">Assign</a></li>
               <li><a href="/admin.html">Admin</a></li>
+	      <li><a href="/streets.html">Map</a></li>
             </ul>
           </div>
         </div>
@@ -59,13 +60,33 @@
       <div ng-controller="apiCtrl">
         <span>Street Name</span><br><br>
         <input type="text" ng-model="streetNumber" placeholder="123">
-        <input type="text" ng-model="streetName" placeholder="Main Street"><br><br>
+        <input type="text" ng-model="streetName" placeholder="Main Street"><br>
+	<select class="input-medium" ng-model="cityName" ng-init="Richmond" id="region">
+          <option value="Richmond">Richmond</option>
+          <option value="Henrico">Henrico</option>
+          <option value="Hanover">Ashland</option>
+	  <option value="Chesterfield">Midlothian</option>
+	</select><br><br>
+
+        <table border="1" id="streets">
+          <tr>
+            <th>From</th>
+            <th>To</th>
+          </tr>
+          <tr ng-repeat="street in streets | orderBy:'from'">
+            <td>{{street.from}}</td>
+            <td>{{street.to}}</td>
+          </tr>
+        </table>
+
+	<br><br>
+
 	<span>Volunteer Name</span><br><br>
 	<input type="text" ng-model="volunteerName" placeholder="Bob Smith">
         <h3 class="button"><a ng-click="updateVolunteer()">Update</a></h3>
         <h3>{{userMessage}}</h3>
+
       </div>
-      <br>
 
     <br><br>
   </body>

@@ -119,10 +119,13 @@
 	    center.push(centerLong);
 	    center.push(centerLat);
 
-	new mapboxgl.Popup()
-	  .setLngLat(center)
-	  .setHTML(region)
-	  .addTo(map);
+	var regionMap = {};
+	    regionMap.zoom = 13.5;
+	    regionMap.center = center;
+
+	// change orientation to the region that was selected
+	map.flyTo(regionMap);
+
       });
 
     });

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset='utf-8' />
+  <title>Love Your Neighbor Map</title>
+  <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+  <!-- Import Mapbox GL JS -->
+  <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.8.1/mapbox-gl.js'></script>
+  <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.8.1/mapbox-gl.css' rel='stylesheet' />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+    #map {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 100%;
+    }
+
+    /**
+    * Set rules for how the map overlays
+    * (information box and legend) will be displayed
+    * on the page. */
+    .map-overlay {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      background: rgba(255, 255, 255, 0.8);
+      margin-right: 20px;
+      font-family: Arial, sans-serif;
+      overflow: auto;
+      border-radius: 3px; 
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id='map'></div>
+
+  <script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoidGVycmVuIiwiYSI6ImNrOGtpbWd0ejAwamwzZHA2b21uczN5MHMifQ.2p8i_s3eCBY0UDB3ed59uQ';
+
+    var map = new mapboxgl.Map({
+      container: 'map', // The container ID
+      style: 'mapbox://styles/terren/ck9k2vj210vv41jmtmh2xvmnj', // Custom style for the Henrico County map
+      center: [-77.43, 37.54], // Starting position [longitude, latitude] of Third Church
+      zoom: 14 // Starting zoom level
+    });
+
+    // Add zoom and rotation controls to the map.
+    map.addControl(new mapboxgl.NavigationControl());
+
+    //
+    map.on('load', function() {
+      // Change the cursor to a pointer when the mouse is over the Churches layer.
+      map.on('mouseenter', 'henrico-streets', function() {
+        map.getCanvas().style.cursor = 'pointer';
+      });
+ 
+      // Change it back to a pointer when it leaves.
+      map.on('mouseleave', 'henrico-streets', function() {
+        map.getCanvas().style.cursor = '';
+      });
+
+      // When a click event occurs on a feature in the places layer, open a popup at the
+      // location of the feature, with description HTML from its properties.
+      map.on('click', 'henrico-streets', function(e) {
+        var coordinates = e.features[0].geometry.coordinates[0];
+	var streetName = e.features[0].properties.streetName;
+	var streetType = e.features[0].properties.streetType;
+	var functionalClass = e.features[0].properties.functionalClass;
+	var volunteerStatus = e.features[0].properties.volunteerStatus;
+	var blockId = e.features[0].id;
+	var leftFromAddress = e.features[0].properties.leftFromAddress;
+        var leftToAddress = e.features[0].properties.leftToAddress;
+        var rightFromAddress = e.features[0].properties.rightFromAddress;
+        var rightToAddress = e.features[0].properties.rightToAddress;
+
+        //var display = 'test' + coordinates[0];
+        var display = '<html>' + '<b>' + 'Block : ' + '</b>' + 
+	    leftToAddress + '-' + leftFromAddress + ' ' + streetName + '<br>' + '<br>'; 
+	//    'Block ID: ' + blockId + '<br>' +
+	//    'Street Type: ' + streetType + '<br>Functional Class: ' + functionalClass + '<br>' + '<br>';
+
+	if (volunteerStatus) {
+	    display = display + 'Block has been adopted!' + '<br>' + '</html>';
+	} else {
+	    display = display + '<a href="https://www.forrichmond.org/loveyourneighbor">' +
+		'<button>Volunteer Block</button>' + '<br>' +
+		'</a>' + '</html>';
+	}
+
+        // Ensure that if the map is zoomed out such that multiple
+        // copies of the feature are visible, the popup appears
+        // over the copy being pointed to.
+        while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+          coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+        }
+
+        // Create the popup box
+        new mapboxgl.Popup()
+          .setLngLat(coordinates)
+          .setHTML(display)
+          .addTo(map);
+      });
+
+      // When a click event occurs on a map region
+      map.on('click', 'regions', function(e) {
+        //var coordinates = e.features[0].geometry.coordinates[0];
+	var coordinates = [-77.43, 37.54];
+	var region = e.features[0].properties.region;
+	var centerLong = e.features[0].properties.centerLong;
+	var centerLat = e.features[0].properties.centerLat;
+	var center = [];
+	    center.push(centerLong);
+	    center.push(centerLat);
+
+	new mapboxgl.Popup()
+	  .setLngLat(center)
+	  .setHTML(region)
+	  .addTo(map);
+      });
+
+    });
+  </script>
+
+</body>
+
+</html>

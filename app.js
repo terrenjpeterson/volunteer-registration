@@ -19,6 +19,8 @@ var THIRD_FILE = "third.html";
 var ADMIN_FILE = "admin.html";
 var STREETS_FILE = "streets.html";
 var HENRICO_FILE = "henrico.html";
+var HANOVER_FILE = "hanover.html";
+var CHESTERFIELD_FILE = "chesterfield.html";
 var ASSIGN_FILE = "assign.html";
 var GOOGLE_FILE = "google.html";
 var BLOCK_FILE = "data/blockData.geojson";
@@ -33,6 +35,8 @@ var admin_page = fs.readFileSync(ADMIN_FILE, 'utf8');
 var google_page = fs.readFileSync(GOOGLE_FILE, 'utf8');
 var streets_page = fs.readFileSync(STREETS_FILE, 'utf8');
 var henrico_page = fs.readFileSync(HENRICO_FILE, 'utf8');
+var hanover_page = fs.readFileSync(HANOVER_FILE, 'utf8');
+var chesterfield_page = fs.readFileSync(CHESTERFIELD_FILE, 'utf8');
 var assign_page = fs.readFileSync(ASSIGN_FILE, 'utf8');
 var blockRawData_01 = fs.readFileSync('data/blockData-01.geojson', 'utf8');
 var blockRawData_02 = fs.readFileSync('data/blockData-02.geojson', 'utf8');
@@ -161,6 +165,16 @@ app.get('/henrico.html', function (req, res) {
   console.log('henrico map page hit');
 })
 
+app.get('/hanover.html', function (req, res) {
+  res.send(hanover_page)
+  console.log('hanover map page hit');
+})
+
+app.get('/chesterfield.html', function (req, res) {
+  res.send(chesterfield_page)
+  console.log('chesterfield map page hit');
+})
+
 app.get('/google.html', function (req, res) {
   res.send(google_page)
   console.log('google page hit');
@@ -207,7 +221,7 @@ app.post('/updateBlock', function (request, response) {
   console.log('attempted to update a block using device ' + reqDevice);
 
   //
-  // first receive the game id object coming in from the request
+  // first receive the street data provided in the request
   //
   var data = "";
 
@@ -219,7 +233,6 @@ app.post('/updateBlock', function (request, response) {
     console.log("Processing Request");
 
     var volunteerData = eval('(' + data + ')');
-    //var gameId = gameData.gameId;
 
     console.log('data provided: ' + JSON.stringify(volunteerData));
 
@@ -356,6 +369,15 @@ app.post('/updateBlock', function (request, response) {
       response.send(responseData);
     }
   });
+})
+
+// this is the wrapper for the publish tileset API
+app.post('/updateMap', function (request, response) {
+  console.log("update map API requested");
+  var responseData = {};
+      responseData.message = 'Update Requested';
+
+  response.send(responseData);
 })
 
 app.listen(3000, function () {

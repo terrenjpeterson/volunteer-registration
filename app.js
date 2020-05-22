@@ -18,12 +18,16 @@ var RICHMOND_FILE = "richmond.html";
 var THIRD_FILE = "third.html";
 var ADMIN_FILE = "admin.html";
 var STREETS_FILE = "streets.html";
+var COLORS_FILE = "colors.html";
 var HENRICO_FILE = "henrico.html";
 var HANOVER_FILE = "hanover.html";
 var CHESTERFIELD_FILE = "chesterfield.html";
 var ASSIGN_FILE = "assign.html";
 var GOOGLE_FILE = "google.html";
-var BLOCK_FILE = "data/blockData.geojson";
+
+// this is the location in the file system for the geojson files
+
+var BLOCK_FILE = "data/richmondBlockData.geojson";
 
 // read html files into memory so that they can be responded to when a http request is made
 
@@ -34,92 +38,32 @@ var third_page = fs.readFileSync(THIRD_FILE, 'utf8');
 var admin_page = fs.readFileSync(ADMIN_FILE, 'utf8');
 var google_page = fs.readFileSync(GOOGLE_FILE, 'utf8');
 var streets_page = fs.readFileSync(STREETS_FILE, 'utf8');
+var colors_page = fs.readFileSync(COLORS_FILE, 'utf8');
 var henrico_page = fs.readFileSync(HENRICO_FILE, 'utf8');
 var hanover_page = fs.readFileSync(HANOVER_FILE, 'utf8');
 var chesterfield_page = fs.readFileSync(CHESTERFIELD_FILE, 'utf8');
 var assign_page = fs.readFileSync(ASSIGN_FILE, 'utf8');
-var blockRawData_01 = fs.readFileSync('data/blockData-01.geojson', 'utf8');
-var blockRawData_02 = fs.readFileSync('data/blockData-02.geojson', 'utf8');
-var blockRawData_03 = fs.readFileSync('data/blockData-03.geojson', 'utf8');
-var blockRawData_04 = fs.readFileSync('data/blockData-04.geojson', 'utf8');
-var blockRawData_05 = fs.readFileSync('data/blockData-05.geojson', 'utf8');
-var blockRawData_06 = fs.readFileSync('data/blockData-06.geojson', 'utf8');
-var blockRawData_07 = fs.readFileSync('data/blockData-07.geojson', 'utf8');
-var blockRawData_08 = fs.readFileSync('data/blockData-08.geojson', 'utf8');
-var blockRawData_09 = fs.readFileSync('data/blockData-09.geojson', 'utf8');
-var blockRawData_10 = fs.readFileSync('data/blockData-10.geojson', 'utf8');
-var blockRawData_11 = fs.readFileSync('data/blockData-11.geojson', 'utf8');
-var blockRawData_12 = fs.readFileSync('data/blockData-12.geojson', 'utf8');
+
+// read geojson data files for each municipality
+
+var richmondBlockData = fs.readFileSync(BLOCK_FILE, 'utf8');
 
 // this gets static files linked so that they may be served in get requests
 
 app.use('/js', express.static(__dirname + '/js'));
 app.use('/css', express.static(__dirname + '/css'));
 
-// this loads block level data
+// this loads block level data - will be used in the API
 console.log("Loading Block Level Data");
 var blockData = {};
     blockData.type = "FeatureCollection";
 var featureArray = [];
-var blockData01 = eval('(' + blockRawData_01 + ')');
-var blockData02 = eval('(' + blockRawData_02 + ')');
-var blockData03 = eval('(' + blockRawData_03 + ')');
-var blockData04 = eval('(' + blockRawData_04 + ')');
-var blockData05 = eval('(' + blockRawData_05 + ')');
-var blockData06 = eval('(' + blockRawData_06 + ')');
-var blockData07 = eval('(' + blockRawData_07 + ')');
-var blockData08 = eval('(' + blockRawData_08 + ')');
-var blockData09 = eval('(' + blockRawData_09 + ')');
-var blockData10 = eval('(' + blockRawData_10 + ')');
-var blockData11 = eval('(' + blockRawData_11 + ')');
-var blockData12 = eval('(' + blockRawData_12 + ')');
+var blockData01 = eval('(' + richmondBlockData + ')');
+
+console.log("Loading Richmond Block Level Data");
 
 for (var j = 0; j < blockData01.features.length; j++) {
   featureArray.push(blockData01.features[j]);
-}
-
-for (var j = 0; j < blockData02.features.length; j++) {
-  featureArray.push(blockData02.features[j]);    
-}
-
-for (var j = 0; j < blockData03.features.length; j++) {
-  featureArray.push(blockData03.features[j]);    
-}
-
-for (var j = 0; j < blockData04.features.length; j++) {
-  featureArray.push(blockData04.features[j]);    
-}
-
-for (var j = 0; j < blockData05.features.length; j++) {
-  featureArray.push(blockData05.features[j]);    
-}
-
-for (var j = 0; j < blockData06.features.length; j++) {
-  featureArray.push(blockData06.features[j]);    
-}
-
-for (var j = 0; j < blockData07.features.length; j++) {
-  featureArray.push(blockData07.features[j]);    
-}
-
-for (var j = 0; j < blockData08.features.length; j++) {
-  featureArray.push(blockData08.features[j]);    
-}
-
-for (var j = 0; j < blockData09.features.length; j++) {
-  featureArray.push(blockData09.features[j]);    
-}
-
-for (var j = 0; j < blockData10.features.length; j++) {
-  featureArray.push(blockData10.features[j]);    
-}
-
-for (var j = 0; j < blockData11.features.length; j++) {
-  featureArray.push(blockData11.features[j]);    
-}
-
-for (var j = 0; j < blockData12.features.length; j++) {
-  featureArray.push(blockData12.features[j]);    
 }
 
 blockData.features = featureArray;
@@ -158,6 +102,11 @@ app.get('/assign.html', function (req, res) {
 app.get('/streets.html', function (req, res) {
   res.send(streets_page)
   console.log('streets map page hit');
+})
+
+app.get('/colors.html', function (req, res) {
+  res.send(colors_page)
+  console.log('colors map page hit');
 })
 
 app.get('/henrico.html', function (req, res) {

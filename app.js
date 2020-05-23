@@ -27,7 +27,8 @@ var GOOGLE_FILE = "google.html";
 
 // this is the location in the file system for the geojson files
 
-var BLOCK_FILE = "data/richmondBlockData.geojson";
+var RICHMOND_BLOCK_FILE = "data/Richmond-blockData.geojson";
+var HENRICO_BLOCK_FILE = "data/Henrico-blockData.geojson";
 
 // read html files into memory so that they can be responded to when a http request is made
 
@@ -46,7 +47,8 @@ var assign_page = fs.readFileSync(ASSIGN_FILE, 'utf8');
 
 // read geojson data files for each municipality
 
-var richmondBlockData = fs.readFileSync(BLOCK_FILE, 'utf8');
+var richmondBlockData = fs.readFileSync(RICHMOND_BLOCK_FILE, 'utf8');
+var henricoBlockData = fs.readFileSync(HENRICO_BLOCK_FILE, 'utf8');
 
 // this gets static files linked so that they may be served in get requests
 
@@ -58,6 +60,8 @@ console.log("Loading Block Level Data");
 var blockData = {};
     blockData.type = "FeatureCollection";
 var featureArray = [];
+
+// load Richmond City data
 var blockData01 = eval('(' + richmondBlockData + ')');
 
 console.log("Loading Richmond Block Level Data");
@@ -66,10 +70,20 @@ for (var j = 0; j < blockData01.features.length; j++) {
   featureArray.push(blockData01.features[j]);
 }
 
+// load Henrico County data
+var blockData02 = eval('(' + henricoBlockData + ')');
+
+console.log("Loading Henrico Block Level Data");
+
+for (var j = 0; j < blockData02.features.length; j++) {
+  featureArray.push(blockData02.features[j]);
+}
+
+// done loading individual files 
 blockData.features = featureArray;
 
-console.log("First Record");
-console.log(blockData.features[0].properties);
+// print out info to console verifying what data was loaded
+console.log("First Record " + JSON.stringify(blockData.features[0].properties));
 console.log("Total Records: " + blockData.features.length);
 
 // this processes the main request to the home page

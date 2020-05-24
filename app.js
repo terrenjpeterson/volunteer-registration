@@ -67,19 +67,17 @@ var blockData01 = eval('(' + richmondBlockData + ')');
 console.log("Loading Richmond Block Level Data");
 
 for (var j = 0; j < blockData01.features.length; j++) {
+  if (j < 5) {
+    console.log(JSON.stringify(blockData01.features[j]));
+  //  console.log(JSON.stringify(featureArray));
+  }  
   var currentBlock = {};
-      currentBlock.leftFromAddress  = blockData01.features[j].properties.leftFromAddress;
-      currentBlock.leftToAddress    = blockData01.features[j].properties.leftToAddress;
-      currentBlock.rightFromAddress = blockData01.features[j].properties.rightFromAddress;
-      currentBlock.rightToAddress   = blockData01.features[j].properties.rightToAddress;
-      currentBlock.streetName       = blockData01.features[j].properties.streetName;
-      currentBlock.id               = blockData01.features[j].id;
-      currentBlock.region           = "Richmond";
+      currentBlock.type        = blockData01.features[j].type;
+      currentBlock.geometry = blockData01.features[j].geometry;
+      currentBlock.properties  = blockData01.features[j].properties
+      currentBlock.id          = blockData01.features[j].id;
+      currentBlock.properties.region = "Richmond";
   featureArray.push(currentBlock);
-  //if (j < 5) {
-    //console.log(JSON.stringify(blockData01.features[j]));
-    //console.log(JSON.stringify(featureArray));
-  //}
 }
 
 // load Henrico County data
@@ -89,13 +87,11 @@ console.log("Loading Henrico Block Level Data");
 
 for (var j = 0; j < blockData02.features.length; j++) {
   var currentBlock = {};
-      currentBlock.leftFromAddress  = blockData02.features[j].properties.leftFromAddress;
-      currentBlock.leftToAddress    = blockData02.features[j].properties.leftToAddress;
-      currentBlock.rightFromAddress = blockData02.features[j].properties.rightFromAddress;
-      currentBlock.rightToAddress   = blockData02.features[j].properties.rightToAddress;
-      currentBlock.streetName       = blockData02.features[j].properties.streetName;
-      currentBlock.id               = blockData02.features[j].id;
-      currentBlock.region           = "Henrico";
+      currentBlock.type       = blockData02.features[j].type;
+      currentBlock.geometry   = blockData02.features[j].geometry;
+      currentBlock.properties = blockData02.features[j].properties.leftFromAddress;
+      currentBlock.id         = blockData02.features[j].id;
+      currentBlock.properties.region = "Henrico";
   featureArray.push(currentBlock);
 }
 
@@ -229,20 +225,20 @@ app.post('/updateBlock', function (request, response) {
 
     for (var i = 0; i < blockData.features.length; i++) {
       //console.log("Checking " + blockData.features[i].properties.streetName + " match " + volunteerData.streetName);
-      if (blockData.features[i].streetName.toLowerCase() == volunteerData.streetName.toLowerCase()) {
+      if (blockData.features[i].properties.streetName == volunteerData.streetName) {
         //console.log("Found Match :" + JSON.stringify(blockData.features[i]));
 	// check to see if a street number was provided - if so, need to match one of the attributes for the block
 	if (volunteerData.streetNumber) {
 	    //console.log("Match Street Number: " + volunteerData.streetNumber);
 	    //console.log("Block Data: " + JSON.stringify(blockData.features[i]));
-	    if (volunteerData.streetNumber == blockData.features[i].leftFromAddress ||
-	        volunteerData.streetNumber == blockData.features[i].leftToAddress ||
-		volunteerData.streetNumber == blockData.features[i].rightFromAddress ||
-		volunteerData.streetNumber == blockData.features[i].rightToAddress) {
+	    if (volunteerData.streetNumber == blockData.features[i].properties.leftFromAddress ||
+	        volunteerData.streetNumber == blockData.features[i].properties.leftToAddress ||
+		volunteerData.streetNumber == blockData.features[i].properties.rightFromAddress ||
+		volunteerData.streetNumber == blockData.features[i].properties.rightToAddress) {
 
 		  matchedBlocks += 1;
 		  matchedId     = blockData.features[i].id;
-		  matchedRegion = blockData.features[i].region;
+		  matchedRegion = blockData.features[i].properties.region;
 
 		  currBlockData = blockData.features[i]
 	    }
@@ -260,15 +256,15 @@ app.post('/updateBlock', function (request, response) {
             var blockMatch = {};
 
 	    if (blockData.features[i].leftFromAddress) {
-		blockMatch.from = blockData.features[i].leftFromAddress;
+		blockMatch.from = blockData.features[i].properties.leftFromAddress;
 	    } else {
-		blockMatch.from = blockData.features[i].rightFromAddress;
+		blockMatch.from = blockData.features[i].properties.rightFromAddress;
 	    }
 
             if (blockData.features[i].leftToAddress) {
-                blockMatch.to = blockData.features[i].leftToAddress;
+                blockMatch.to = blockData.features[i].properties.leftToAddress;
             } else {
-                blockMatch.to = blockData.features[i].rightToAddress;
+                blockMatch.to = blockData.features[i].properties.rightToAddress;
             }
 
 	    //console.log("Block Match :" + JSON.stringify(blockMatch));
@@ -295,16 +291,24 @@ app.post('/updateBlock', function (request, response) {
       responseData.message = 'Found Block. Feature Id:' + matchedId + ' Region:' + matchedRegion;
 
       // update the current block data with the new user provided information
-      currBlockData.volunteerName   = volunteerData.volunteerName;
-      currBlockData.volunteerStatus = true;
+      currBlockData.properties.volunteerName   = volunteerData.volunteerName;
+      currBlockData.properties.volunteerStatus = true;
 
       // these are the parameters for the dataset containing the feature to be updated
       const token = 'sk.eyJ1IjoidGVycmVuIiwiYSI6ImNrOTl6eHF3aTAwcWkzbHF1ZWJwZTM1NjIifQ.A2ufEIax4lDJ53ZXemEXjg';
-      const datasetId = 'ck9haxjo108f72ln6v3skobfn';
+
+      var datasetId = '';
+
+      // note: there are multiple datasets - find the match based on the region
+      if (matchedRegion = "Richmond") {
+        datasetId = 'ck9haxjo108f72ln6v3skobfn';
+      } else if (matchedRegion = "Henrico") {
+    	datasetId = 'ck9j048g000u72sn2avymh1v2';
+      }
 
       // these are the parameters for the API endpoint including the feature to be updated
       const api_url = 'api.mapbox.com';
-      const api_uri = '/datasets/v1/terren/' + datasetId + '/features/' + matchedId + '?access_token=' + token;
+      var   api_uri = '/datasets/v1/terren/' + datasetId + '/features/' + matchedId + '?access_token=' + token;
       const api_port = 443;
 
       var options = {
@@ -317,7 +321,8 @@ app.post('/updateBlock', function (request, response) {
            }
       };
 
-      console.log("Starting API call");
+      console.log("Starting API call. " + api_uri);
+      console.log(JSON.stringify(currBlockData));
 
       var req = https.request(options, (res) => {
           console.log('statusCode:', res.statusCode);

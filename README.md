@@ -1,6 +1,8 @@
-# volunteer-registration
+# Volunteer Registration and Map Management
 
-## how to build layer
+This repo contains the code to automate and manage mapping data used to track volunteers around the Greater Richmond Region.
+
+## How to build the initial map
 
 City of Richmond Data
 
@@ -64,8 +66,30 @@ Dowload these to your computer.
 
 Use one file to seed a new dataset through Mapbox studio, then import the others into the same dataset.
 
+## To get the API to work, need to first gather the datasets from Mapbox as we need the unique identifier for what is being updated.
+
+Step 1 - Run getStreetData lambda function to pull data all of the features (blocks) from a specific dataset. 
+Given limitations of the size of the files, will need to run this multiple times as the limit is around 2000 features in a single API call.
+
+Step 2 - Copy the files from S3 to an EC2 host.
+
+Step 3 - Run the merge script to combine into one.
+
+Step 4 - At startup of the API it will read the files for the dataset.
+
 ## good references
 
 Not in Philly
 
 https://github.com/yurykorzun/notinphilly
+
+
+## Key Mapbox Limitations
+
+Mapbox Studio dataset editor can only display datasets of 20 MB or smaller. This is why these datasets have not been combined.
+
+## How to update the map
+
+To update the map using the mapbox API, the unique feature id is required to instruct Mapbox which entry should have it's properties update.
+From the administrative app, the street address will be provided which is then used to search for a the unique feature id.
+If the query was too vague and multiple features with the same information are found, instruct the user to provide more specifics and give an array with the options.

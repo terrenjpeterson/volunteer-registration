@@ -67,7 +67,19 @@ var blockData01 = eval('(' + richmondBlockData + ')');
 console.log("Loading Richmond Block Level Data");
 
 for (var j = 0; j < blockData01.features.length; j++) {
-  featureArray.push(blockData01.features[j]);
+  var currentBlock = {};
+      currentBlock.leftFromAddress  = blockData01.features[j].properties.leftFromAddress;
+      currentBlock.leftToAddress    = blockData01.features[j].properties.leftToAddress;
+      currentBlock.rightFromAddress = blockData01.features[j].properties.rightFromAddress;
+      currentBlock.rightToAddress   = blockData01.features[j].properties.rightToAddress;
+      currentBlock.streetName       = blockData01.features[j].properties.streetName;
+      currentBlock.id               = blockData01.features[j].id;
+      currentBlock.region           = "Richmond";
+  featureArray.push(currentBlock);
+  //if (j < 5) {
+    //console.log(JSON.stringify(blockData01.features[j]));
+    //console.log(JSON.stringify(featureArray));
+  //}
 }
 
 // load Henrico County data
@@ -76,14 +88,22 @@ var blockData02 = eval('(' + henricoBlockData + ')');
 console.log("Loading Henrico Block Level Data");
 
 for (var j = 0; j < blockData02.features.length; j++) {
-  featureArray.push(blockData02.features[j]);
+  var currentBlock = {};
+      currentBlock.leftFromAddress  = blockData02.features[j].properties.leftFromAddress;
+      currentBlock.leftToAddress    = blockData02.features[j].properties.leftToAddress;
+      currentBlock.rightFromAddress = blockData02.features[j].properties.rightFromAddress;
+      currentBlock.rightToAddress   = blockData02.features[j].properties.rightToAddress;
+      currentBlock.streetName       = blockData02.features[j].properties.streetName;
+      currentBlock.id               = blockData02.features[j].id;
+      currentBlock.region           = "Henrico";
+  featureArray.push(currentBlock);
 }
 
 // done loading individual files 
 blockData.features = featureArray;
 
 // print out info to console verifying what data was loaded
-console.log("First Record " + JSON.stringify(blockData.features[0].properties));
+console.log("First Record " + JSON.stringify(blockData.features[0]));
 console.log("Total Records: " + blockData.features.length);
 
 // this processes the main request to the home page
@@ -204,23 +224,26 @@ app.post('/updateBlock', function (request, response) {
     var matchedBlocks = 0;
     var blockOptions = [];
     var matchedId = '';
+    var matchedRegion = '';
     var currBlockData = {};
 
     for (var i = 0; i < blockData.features.length; i++) {
       //console.log("Checking " + blockData.features[i].properties.streetName + " match " + volunteerData.streetName);
-      if (blockData.features[i].properties.streetName == volunteerData.streetName) {
+      if (blockData.features[i].streetName.toLowerCase() == volunteerData.streetName.toLowerCase()) {
         //console.log("Found Match :" + JSON.stringify(blockData.features[i]));
 	// check to see if a street number was provided - if so, need to match one of the attributes for the block
 	if (volunteerData.streetNumber) {
 	    //console.log("Match Street Number: " + volunteerData.streetNumber);
 	    //console.log("Block Data: " + JSON.stringify(blockData.features[i]));
-	    if (volunteerData.streetNumber == blockData.features[i].properties.leftFromAddress ||
-	        volunteerData.streetNumber == blockData.features[i].properties.leftToAddress ||
-		volunteerData.streetNumber == blockData.features[i].properties.rightFromAddress ||
-		volunteerData.streetNumber == blockData.features[i].properties.rightToAddress) {
+	    if (volunteerData.streetNumber == blockData.features[i].leftFromAddress ||
+	        volunteerData.streetNumber == blockData.features[i].leftToAddress ||
+		volunteerData.streetNumber == blockData.features[i].rightFromAddress ||
+		volunteerData.streetNumber == blockData.features[i].rightToAddress) {
 
 		  matchedBlocks += 1;
-		  matchedId = blockData.features[i].id;
+		  matchedId     = blockData.features[i].id;
+		  matchedRegion = blockData.features[i].region;
+
 		  currBlockData = blockData.features[i]
 	    }
         } else {
@@ -228,22 +251,24 @@ app.post('/updateBlock', function (request, response) {
 	    //console.log("No block number provided");
 
             matchedBlocks += 1;
-            matchedId = blockData.features[i].id;
+            matchedId     = blockData.features[i].id;
+	    matchedRegion = blockData.features[i].region;
+
 	    currBlockData = blockData.features[i]
 
 	    // this is the object returned back in the API response that simplifies the from/to on the block
             var blockMatch = {};
 
-	    if (blockData.features[i].properties.leftFromAddress) {
-		blockMatch.from = blockData.features[i].properties.leftFromAddress;
+	    if (blockData.features[i].leftFromAddress) {
+		blockMatch.from = blockData.features[i].leftFromAddress;
 	    } else {
-		blockMatch.from = blockData.features[i].properties.rightFromAddress;
+		blockMatch.from = blockData.features[i].rightFromAddress;
 	    }
 
-            if (blockData.features[i].properties.leftToAddress) {
-                blockMatch.to = blockData.features[i].properties.leftToAddress;
+            if (blockData.features[i].leftToAddress) {
+                blockMatch.to = blockData.features[i].leftToAddress;
             } else {
-                blockMatch.to = blockData.features[i].properties.rightToAddress;
+                blockMatch.to = blockData.features[i].rightToAddress;
             }
 
 	    //console.log("Block Match :" + JSON.stringify(blockMatch));
@@ -267,11 +292,11 @@ app.post('/updateBlock', function (request, response) {
 
     } else if (matchedBlocks == 1) {
       // a single block was found - go ahead and call the API to update the feature
-      responseData.message = 'Found Block. Feature Id:' + matchedId;
+      responseData.message = 'Found Block. Feature Id:' + matchedId + ' Region:' + matchedRegion;
 
       // update the current block data with the new user provided information
-      currBlockData.properties.volunteerName   = volunteerData.volunteerName;
-      currBlockData.properties.volunteerStatus = true;
+      currBlockData.volunteerName   = volunteerData.volunteerName;
+      currBlockData.volunteerStatus = true;
 
       // these are the parameters for the dataset containing the feature to be updated
       const token = 'sk.eyJ1IjoidGVycmVuIiwiYSI6ImNrOTl6eHF3aTAwcWkzbHF1ZWJwZTM1NjIifQ.A2ufEIax4lDJ53ZXemEXjg';

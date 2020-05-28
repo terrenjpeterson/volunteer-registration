@@ -29,6 +29,7 @@ var GOOGLE_FILE = "google.html";
 
 var RICHMOND_BLOCK_FILE = "data/Richmond-blockData.geojson";
 var HENRICO_BLOCK_FILE = "data/Henrico-blockData.geojson";
+var HANOVER_BLOCK_FILE = "data/Hanover-blockData.geojson";
 
 // read html files into memory so that they can be responded to when a http request is made
 
@@ -48,7 +49,8 @@ var assign_page = fs.readFileSync(ASSIGN_FILE, 'utf8');
 // read geojson data files for each municipality
 
 var richmondBlockData = fs.readFileSync(RICHMOND_BLOCK_FILE, 'utf8');
-var henricoBlockData = fs.readFileSync(HENRICO_BLOCK_FILE, 'utf8');
+var henricoBlockData  = fs.readFileSync(HENRICO_BLOCK_FILE, 'utf8');
+var hanoverBlockData  = fs.readFileSync(HANOVER_BLOCK_FILE, 'utf8');
 
 // this gets static files linked so that they may be served in get requests
 
@@ -73,7 +75,7 @@ for (var j = 0; j < blockData01.features.length; j++) {
   }  
   var currentBlock = {};
       currentBlock.type        = blockData01.features[j].type;
-      currentBlock.geometry = blockData01.features[j].geometry;
+      currentBlock.geometry    = blockData01.features[j].geometry;
       currentBlock.properties  = blockData01.features[j].properties
       currentBlock.id          = blockData01.features[j].id;
       currentBlock.properties.region = "Richmond";
@@ -89,9 +91,24 @@ for (var j = 0; j < blockData02.features.length; j++) {
   var currentBlock = {};
       currentBlock.type       = blockData02.features[j].type;
       currentBlock.geometry   = blockData02.features[j].geometry;
-      currentBlock.properties = blockData02.features[j].properties.leftFromAddress;
+      currentBlock.properties = blockData02.features[j].properties;
       currentBlock.id         = blockData02.features[j].id;
       currentBlock.properties.region = "Henrico";
+  featureArray.push(currentBlock);
+}
+
+// load Hanover County data
+var blockData03 = eval('(' + hanoverBlockData + ')');
+
+console.log("Loading Hanover Block Level Data");
+
+for (var j = 0; j < blockData03.features.length; j++) {
+  var currentBlock = {};
+      currentBlock.type       = blockData03.features[j].type;
+      currentBlock.geometry   = blockData03.features[j].geometry;
+      currentBlock.properties = blockData03.features[j].properties;
+      currentBlock.id         = blockData03.features[j].id;
+      currentBlock.properties.region = "Hanover";
   featureArray.push(currentBlock);
 }
 
@@ -248,7 +265,7 @@ app.post('/updateBlock', function (request, response) {
 
             matchedBlocks += 1;
             matchedId     = blockData.features[i].id;
-	    matchedRegion = blockData.features[i].region;
+	    matchedRegion = blockData.features[i].properties.region;
 
 	    currBlockData = blockData.features[i]
 
@@ -299,11 +316,13 @@ app.post('/updateBlock', function (request, response) {
 
       var datasetId = '';
 
-      // note: there are multiple datasets - find the match based on the region
-      if (matchedRegion = "Richmond") {
+      // note: there are multiple datasets - find the match based on the region loaded in the array
+      if (matchedRegion == "Richmond") {
         datasetId = 'ck9haxjo108f72ln6v3skobfn';
-      } else if (matchedRegion = "Henrico") {
+      } else if (matchedRegion == "Henrico") {
     	datasetId = 'ck9j048g000u72sn2avymh1v2';
+      } else if (matchedRegion == "Hanover") {
+	datasetId = 'ck9zugz390eve2st7zggkymwl';
       }
 
       // these are the parameters for the API endpoint including the feature to be updated

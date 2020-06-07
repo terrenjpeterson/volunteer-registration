@@ -72,9 +72,9 @@
 
     var map = new mapboxgl.Map({
       container: 'map', // The container ID
-      style: 'mapbox://styles/terren/ck9frvzi41hz51iqpzsjd734c', // Custom style for the For Richmond map
-      center: [-77.43, 37.54], // Starting position [longitude, latitude] of Third Church
-      zoom: 14 // Starting zoom level
+      style: 'mapbox://styles/terren/ckain3ou90yfz1jp690ci93k3', // Custom style for the For Richmond map
+      center: [-77.43, 37.54], // Starting position [longitude, latitude] of Richmond
+      zoom: 10 // Starting zoom level
     });
 
     // Add zoom and rotation controls to the map.
@@ -101,14 +101,30 @@
 	var functionalClass = e.features[0].properties.functionalClass;
 	var volunteerStatus = e.features[0].properties.volunteerStatus;
 	var blockId = e.features[0].id;
-	var leftFromAddress = e.features[0].properties.leftFromAddress;
-        var leftToAddress = e.features[0].properties.leftToAddress;
+
+	var leftFromAddress  = e.features[0].properties.leftFromAddress;
+        var leftToAddress    = e.features[0].properties.leftToAddress;
         var rightFromAddress = e.features[0].properties.rightFromAddress;
-        var rightToAddress = e.features[0].properties.rightToAddress;
+        var rightToAddress   = e.features[0].properties.rightToAddress;
+
+	var displayFromAddress = {};
+	var displayToAddress = {};
+
+	if (leftFromAddress != "") {
+	    displayFromAddress = leftFromAddress;
+	} else {
+	    displayFromAddress = rightFromAddress;
+	}
+
+	if (leftToAddress != "") {
+	    displayToAddress = leftToAddress;
+	} else {
+	    displayToAddress = rightToAddress;
+	}
 
         //var display = 'test' + coordinates[0];
         var display = '<html>' + '<b>' + 'Block : ' + '</b>' + 
-	    leftToAddress + '-' + leftFromAddress + ' ' + streetName + '<br>' + '<br>';
+	    displayToAddress + '-' + displayFromAddress + ' ' + streetName + '<br>' + '<br>';
 	//    'Block ID: ' + String(blockId) + '<br>';
 	//    'Street Type: ' + streetType + '<br>Functional Class: ' + functionalClass + '<br>' + '<br>';
 
@@ -133,7 +149,25 @@
           .setHTML(display)
           .addTo(map);
       });
+
+      // When a click event occurs on a map region
+      map.on('click', 'regions', function(e) {
+        var region = e.features[0].properties.region;
+        var centerLong = e.features[0].properties.centerLong;
+        var centerLat = e.features[0].properties.centerLat;
+        var center = [];
+            center.push(centerLong);
+            center.push(centerLat);
+
+        var regionMap = {};
+            regionMap.zoom = 13.5;
+            regionMap.center = center;
+
+        // change orientation to the region that was selected
+        map.flyTo(regionMap);
+      });
     });
+
   </script>
 
 </body>

@@ -83,6 +83,41 @@
     //
     map.on('load', function() {
       // Change the cursor to a pointer when the mouse is over the Churches layer.
+      map.on('mouseenter', 'churches', function() {
+        map.getCanvas().style.cursor = 'pointer';
+      });
+ 
+      // Change it back to a pointer when it leaves.
+      map.on('mouseleave', 'churches', function() {
+        map.getCanvas().style.cursor = '';
+      });
+
+      // When a click event occurs on a Church, open a popup at the
+      // location of the feature, with description HTML from its properties.
+      map.on('click', 'churches', function(e) {
+	// get the geocoordinates of the church, along with the name and the website address
+        var coordinates = e.features[0].geometry.coordinates.slice();
+        var website = e.features[0].properties.Website;
+	var name = e.features[0].properties.Name_of_Church;
+
+	var display = '<html>' +
+	  'Website: <a href="' + website + '" target="_blank" >' + website + '</a></html>' ;
+ 
+        // Ensure that if the map is zoomed out such that multiple
+        // copies of the feature are visible, the popup appears
+        // over the copy being pointed to.
+        while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+          coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+        }
+ 
+	// Create the popup box with the details collected for the Church
+        new mapboxgl.Popup()
+          .setLngLat(coordinates)
+          .setHTML(display)
+          .addTo(map);
+      });
+
+      // Change the cursor to a pointer when the mouse is over the Richmond streets layer.
       map.on('mouseenter', 'richmond-streets', function() {
         map.getCanvas().style.cursor = 'pointer';
       });
@@ -92,9 +127,10 @@
         map.getCanvas().style.cursor = '';
       });
 
-      // When a click event occurs on a feature in the places layer, open a popup at the
+      // When a click event occurs on a block in Richmond, open a popup at the
       // location of the feature, with description HTML from its properties.
       map.on('click', 'richmond-streets', function(e) {
+	// gather the geocoordinates of the block, as well as the street name and volunteer data
         var coordinates = e.features[0].geometry.coordinates[0];
 	var streetName = e.features[0].properties.streetName;
 	var streetType = e.features[0].properties.streetType;
@@ -122,11 +158,8 @@
 	    displayToAddress = rightToAddress;
 	}
 
-        //var display = 'test' + coordinates[0];
         var display = '<html>' + '<b>' + 'Block : ' + '</b>' + 
 	    displayToAddress + '-' + displayFromAddress + ' ' + streetName + '<br>' + '<br>';
-	//    'Block ID: ' + String(blockId) + '<br>';
-	//    'Street Type: ' + streetType + '<br>Functional Class: ' + functionalClass + '<br>' + '<br>';
 
 	if (volunteerStatus) {
 	    display = display + 'Block has been adopted!' + '<br>' + '</html>';
@@ -135,6 +168,204 @@
 		'<button>Volunteer Block</button>' + '<br>' +
 		'</a>' + '</html>';
 	}
+
+        // Ensure that if the map is zoomed out such that multiple
+        // copies of the feature are visible, the popup appears
+        // over the copy being pointed to.
+        while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+          coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+        }
+
+        // Create the popup box
+        new mapboxgl.Popup()
+          .setLngLat(coordinates)
+          .setHTML(display)
+          .addTo(map);
+      });
+
+      // Change the cursor to a pointer when the mouse is over the Hanover streets layer.
+      map.on('mouseenter', 'hanover-streets', function() {
+        map.getCanvas().style.cursor = 'pointer';
+      });
+ 
+      // Change it back to a pointer when it leaves.
+      map.on('mouseleave', 'hanover-streets', function() {
+        map.getCanvas().style.cursor = '';
+      });
+
+      // When a click event occurs on a block in Hanover, open a popup at the
+      // location of the feature, with description HTML from its properties.
+      map.on('click', 'hanover-streets', function(e) {
+        // gather the geocoordinates of the block, as well as the street name and volunteer data
+        var coordinates = e.features[0].geometry.coordinates[0];
+        var streetName = e.features[0].properties.streetName;
+        var streetType = e.features[0].properties.streetType;
+        var functionalClass = e.features[0].properties.functionalClass;
+        var volunteerStatus = e.features[0].properties.volunteerStatus;
+        var blockId = e.features[0].id;
+
+        var leftFromAddress  = e.features[0].properties.leftFromAddress;
+        var leftToAddress    = e.features[0].properties.leftToAddress;
+        var rightFromAddress = e.features[0].properties.rightFromAddress;
+        var rightToAddress   = e.features[0].properties.rightToAddress;
+
+        var displayFromAddress = {};
+        var displayToAddress = {};
+
+        if (leftFromAddress != "") {
+            displayFromAddress = leftFromAddress;
+        } else {
+            displayFromAddress = rightFromAddress;
+        }
+
+        if (leftToAddress != "") {
+            displayToAddress = leftToAddress;
+        } else {
+            displayToAddress = rightToAddress;
+        }
+
+        var display = '<html>' + '<b>' + 'Block : ' + '</b>' +
+            displayToAddress + '-' + displayFromAddress + ' ' + streetName + '<br>' + '<br>';
+
+        if (volunteerStatus) {
+            display = display + 'Block has been adopted!' + '<br>' + '</html>';
+        } else {
+            display = display + '<a href="https://www.forrichmond.org/loveyourneighbor">' +
+                '<button>Volunteer Block</button>' + '<br>' +
+                '</a>' + '</html>';
+        }
+
+        // Ensure that if the map is zoomed out such that multiple
+        // copies of the feature are visible, the popup appears
+        // over the copy being pointed to.
+        while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+          coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+        }
+
+        // Create the popup box
+        new mapboxgl.Popup()
+          .setLngLat(coordinates)
+          .setHTML(display)
+          .addTo(map);
+      });
+
+      // Change the cursor to a pointer when the mouse is over the Henrico streets layer.
+      map.on('mouseenter', 'henrico-streets', function() {
+        map.getCanvas().style.cursor = 'pointer';
+      });
+ 
+      // Change it back to a pointer when it leaves.
+      map.on('mouseleave', 'henrico-streets', function() {
+        map.getCanvas().style.cursor = '';
+      });
+
+      // When a click event occurs on a block in Henrico, open a popup at the
+      // location of the feature, with description HTML from its properties.
+      map.on('click', 'henrico-streets', function(e) {
+        // gather the geocoordinates of the block, as well as the street name and volunteer data
+        var coordinates = e.features[0].geometry.coordinates[0];
+        var streetName = e.features[0].properties.streetName;
+        var streetType = e.features[0].properties.streetType;
+        var functionalClass = e.features[0].properties.functionalClass;
+        var volunteerStatus = e.features[0].properties.volunteerStatus;
+        var blockId = e.features[0].id;
+
+        var leftFromAddress  = e.features[0].properties.leftFromAddress;
+        var leftToAddress    = e.features[0].properties.leftToAddress;
+        var rightFromAddress = e.features[0].properties.rightFromAddress;
+        var rightToAddress   = e.features[0].properties.rightToAddress;
+
+        var displayFromAddress = {};
+        var displayToAddress = {};
+
+        if (leftFromAddress != "") {
+            displayFromAddress = leftFromAddress;
+        } else {
+            displayFromAddress = rightFromAddress;
+        }
+
+        if (leftToAddress != "") {
+            displayToAddress = leftToAddress;
+        } else {
+            displayToAddress = rightToAddress;
+        }
+
+        var display = '<html>' + '<b>' + 'Block : ' + '</b>' +
+            displayToAddress + '-' + displayFromAddress + ' ' + streetName + '<br>' + '<br>';
+
+        if (volunteerStatus) {
+            display = display + 'Block has been adopted!' + '<br>' + '</html>';
+        } else {
+            display = display + '<a href="https://www.forrichmond.org/loveyourneighbor">' +
+                '<button>Volunteer Block</button>' + '<br>' +
+                '</a>' + '</html>';
+        }
+
+        // Ensure that if the map is zoomed out such that multiple
+        // copies of the feature are visible, the popup appears
+        // over the copy being pointed to.
+        while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+          coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+        }
+
+        // Create the popup box
+        new mapboxgl.Popup()
+          .setLngLat(coordinates)
+          .setHTML(display)
+          .addTo(map);
+      });
+
+      // Change the cursor to a pointer when the mouse is over the Richmond streets layer.
+      map.on('mouseenter', 'chesterfield-streets', function() {
+        map.getCanvas().style.cursor = 'pointer';
+      });
+ 
+      // Change it back to a pointer when it leaves.
+      map.on('mouseleave', 'chesterfield-streets', function() {
+        map.getCanvas().style.cursor = '';
+      });
+
+      // When a click event occurs on a block in Chesterfield, open a popup at the
+      // location of the feature, with description HTML from its properties.
+      map.on('click', 'chesterfield-streets', function(e) {
+        // gather the geocoordinates of the block, as well as the street name and volunteer data
+        var coordinates = e.features[0].geometry.coordinates[0];
+        var streetName = e.features[0].properties.streetName;
+        var streetType = e.features[0].properties.streetType;
+        var functionalClass = e.features[0].properties.functionalClass;
+        var volunteerStatus = e.features[0].properties.volunteerStatus;
+        var blockId = e.features[0].id;
+
+        var leftFromAddress  = e.features[0].properties.leftFromAddress;
+        var leftToAddress    = e.features[0].properties.leftToAddress;
+        var rightFromAddress = e.features[0].properties.rightFromAddress;
+        var rightToAddress   = e.features[0].properties.rightToAddress;
+
+        var displayFromAddress = {};
+        var displayToAddress = {};
+
+        if (leftFromAddress != "") {
+            displayFromAddress = leftFromAddress;
+        } else {
+            displayFromAddress = rightFromAddress;
+        }
+
+        if (leftToAddress != "") {
+            displayToAddress = leftToAddress;
+        } else {
+            displayToAddress = rightToAddress;
+        }
+
+        var display = '<html>' + '<b>' + 'Block : ' + '</b>' +
+            displayToAddress + '-' + displayFromAddress + ' ' + streetName + '<br>' + '<br>';
+
+        if (volunteerStatus) {
+            display = display + 'Block has been adopted!' + '<br>' + '</html>';
+        } else {
+            display = display + '<a href="https://www.forrichmond.org/loveyourneighbor">' +
+                '<button>Volunteer Block</button>' + '<br>' +
+                '</a>' + '</html>';
+        }
 
         // Ensure that if the map is zoomed out such that multiple
         // copies of the feature are visible, the popup appears
